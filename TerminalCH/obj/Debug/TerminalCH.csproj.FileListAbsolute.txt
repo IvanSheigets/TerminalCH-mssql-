@@ -1,0 +1,47 @@
+C:\Users\ivan.TOVITAK\Documents\Visual Studio 2008\Projects\TerminalCH\TerminalCH\bin\Debug\TerminalCH.exe
+C:\Users\ivan.TOVITAK\Documents\Visual Studio 2008\Projects\TerminalCH\TerminalCH\bin\Debug\TerminalCH.pdb
+C:\Users\ivan.TOVITAK\Documents\Visual Studio 2008\Projects\TerminalCH\TerminalCH\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\ivan.TOVITAK\Documents\Visual Studio 2008\Projects\TerminalCH\TerminalCH\obj\Debug\TerminalCH.Properties.Resources.resources
+C:\Users\ivan.TOVITAK\Documents\Visual Studio 2008\Projects\TerminalCH\TerminalCH\obj\Debug\TerminalCH.csproj.GenerateResource.Cache
+C:\Users\ivan.TOVITAK\Documents\Visual Studio 2008\Projects\TerminalCH\TerminalCH\obj\Debug\TerminalCH.exe
+C:\Users\ivan.TOVITAK\Documents\Visual Studio 2008\Projects\TerminalCH\TerminalCH\obj\Debug\TerminalCH.pdb
+C:\Users\ivan.TOVITAK\Documents\Visual Studio 2008\Projects\TerminalCH\TerminalCH\obj\Debug\TerminalCH.Main_form.resources
+C:\Users\ivan.TOVITAK\Documents\Visual Studio 2008\Projects\TerminalCH\TerminalCH\obj\Debug\TerminalCH.otgryzka_gp.resources
+C:\Users\ivan.TOVITAK\Documents\Visual Studio 2008\Projects\TerminalCH\TerminalCH\obj\Debug\TerminalCH.otgryzka_gp_enterRylon.resources
+C:\Users\ivan.TOVITAK\Documents\Visual Studio 2008\Projects\TerminalCH\TerminalCH\obj\Debug\TerminalCH.message_dialog.resources
+C:\Users\ivan.TOVITAK\Documents\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.exe
+C:\Users\ivan.TOVITAK\Documents\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.pdb
+C:\Users\ivan.TOVITAK\Documents\TerminalCH(mssql)\TerminalCH\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\ivan.TOVITAK\Documents\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.Main_form.resources
+C:\Users\ivan.TOVITAK\Documents\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.message_dialog.resources
+C:\Users\ivan.TOVITAK\Documents\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.otgryzka_gp.resources
+C:\Users\ivan.TOVITAK\Documents\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.otgryzka_gp_enterRylon.resources
+C:\Users\ivan.TOVITAK\Documents\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.Properties.Resources.resources
+C:\Users\ivan.TOVITAK\Documents\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.csproj.GenerateResource.Cache
+C:\Users\ivan.TOVITAK\Documents\TerminalCH(mssql)\TerminalCH\bin\Debug\TerminalCH.exe
+C:\Users\ivan.TOVITAK\Documents\TerminalCH(mssql)\TerminalCH\bin\Debug\TerminalCH.pdb
+C:\Users\ivan.TOVITAK\Documents\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.MenuForm.resources
+D:\doc\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.exe
+D:\doc\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.pdb
+D:\doc\TerminalCH(mssql)\TerminalCH\bin\Debug\TerminalCH.exe
+D:\doc\TerminalCH(mssql)\TerminalCH\bin\Debug\TerminalCH.pdb
+D:\doc\TerminalCH(mssql)\TerminalCH\obj\Debug\ResolveAssemblyReference.cache
+D:\doc\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.Main_form.resources
+D:\doc\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.MenuForm.resources
+D:\doc\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.message_dialog.resources
+D:\doc\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.otgryzka_gp.resources
+D:\doc\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.otgryzka_gp_enterRylon.resources
+D:\doc\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.Properties.Resources.resources
+D:\doc\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.csproj.GenerateResource.Cache
+D:\Проекты\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.exe
+D:\Проекты\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.pdb
+D:\Проекты\TerminalCH(mssql)\TerminalCH\obj\Debug\ResolveAssemblyReference.cache
+D:\Проекты\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.Main_form.resources
+D:\Проекты\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.MenuForm.resources
+D:\Проекты\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.message_dialog.resources
+D:\Проекты\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.otgryzka_gp.resources
+D:\Проекты\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.otgryzka_gp_enterRylon.resources
+D:\Проекты\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.Properties.Resources.resources
+D:\Проекты\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.csproj.GenerateResource.Cache
+D:\Проекты\TerminalCH(mssql)\TerminalCH\bin\Debug\TerminalCH.exe
+D:\Проекты\TerminalCH(mssql)\TerminalCH\bin\Debug\TerminalCH.pdb
