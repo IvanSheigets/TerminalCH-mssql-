@@ -61,3 +61,13 @@ G:\Projects\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.exe
 G:\Projects\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.pdb
 D:\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.exe
 D:\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.pdb
+D:\TerminalCH(mssql)\TerminalCH\bin\Debug\TerminalCH.exe
+D:\TerminalCH(mssql)\TerminalCH\bin\Debug\TerminalCH.pdb
+D:\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.csprojResolveAssemblyReference.cache
+D:\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.Main_form.resources
+D:\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.MenuForm.resources
+D:\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.message_dialog.resources
+D:\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.otgryzka_gp.resources
+D:\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.otgryzka_gp_enterRylon.resources
+D:\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.Properties.Resources.resources
+D:\TerminalCH(mssql)\TerminalCH\obj\Debug\TerminalCH.csproj.GenerateResource.Cache

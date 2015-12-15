@@ -70,6 +70,9 @@ namespace TerminalCH
         int m_iCountRows=0;
 
 
+        bool testPrint = false;
+        int testPrintCountRows = 0;
+
         ///////////////////////////////////
         
 
@@ -172,6 +175,7 @@ namespace TerminalCH
             m_lstMyRylon = new List<MyRylon>();
 
             MyDialog = new message_dialog();
+            
 
         }
 
@@ -184,7 +188,7 @@ namespace TerminalCH
         {
             if (e.KeyCode == Keys.Enter)
                 OnEnterBarCode("");
-            else if (e.KeyCode == Keys.F1 && button_menu.Enabled==true)
+            else if (e.KeyCode == Keys.F1 && button_menu.Enabled == true)
                 ButtonMenu();
             else if (e.KeyCode == Keys.F2)
                 ClearPalett();
@@ -196,6 +200,8 @@ namespace TerminalCH
                 OtgryzkaGP();
             else if (e.KeyCode == Keys.F9)
                 MyClose();
+            //else if (e.KeyCode == Keys.F10)
+               // TestPrint();
 
 
         }
@@ -566,6 +572,61 @@ namespace TerminalCH
             }
         }
 
+        private List<MyRylon> SetListTempValue(int countItems)
+        {
+            List<MyRylon> list = new List<MyRylon>();
+            Random rnd = new Random();
+
+            for (int i = 0; i < countItems; i++)
+            {
+                MyRylon item = new MyRylon();
+
+                item.iNumRylona = i + 1;
+                item.iBarCode = rnd.Next(100000, 500000);
+                list.Add(item);
+            }
+
+            return list;
+        }
+
+        private void TestPrint()
+        {
+            testPrint = true;
+            testPrintCountRows = 780;
+
+            m_lstMyRylon = SetListTempValue(testPrintCountRows);
+
+            /*if (MyDialog.Show("Друкувати специфікацію?", true) == 1)
+                m_boolPrintSpec = true;
+            else
+                m_boolPrintSpec = false;*/
+            // for (int i = 0; i < 2; i++)
+            {
+                m_iFlagPrintPages = 3;
+                PrintDocument docPrint = new PrintDocument();
+                if (docPrint.PrinterSettings.IsValid)
+                {
+                    docPrint.DefaultPageSettings.Margins.Top = 10;
+                    docPrint.DefaultPageSettings.Margins.Bottom = 10;
+                    docPrint.DefaultPageSettings.Margins.Right = 10;
+                    docPrint.DefaultPageSettings.Margins.Left = 10;
+                    docPrint.PrintPage += new PrintPageEventHandler
+                            (this.docPrint_PrintPage);
+                    docPrint.PrinterSettings.PrintFileName = "ИтакОтгрузка";
+
+                    //docPrintt.PrinterSettings.Copies = (short)pr.m_iNumCopies;
+                    docPrint.PrinterSettings.Copies = 2;
+
+                    PrintPreviewDialog dlgPrint = new PrintPreviewDialog();
+                    dlgPrint.ClientSize = new Size(this.ClientSize.Width, this.ClientSize.Height);
+                    dlgPrint.Document = docPrint;
+
+                    dlgPrint.ShowDialog();
+                    //docPrint.Print();
+                }
+            }
+        }
+
         private void MyPrint()
         {
             if (dataGridView1.Rows.Count > 1)
@@ -683,8 +744,7 @@ namespace TerminalCH
                         }
 
                     }
-                    
-                    
+
                     if (m_lstMyRylon.Count > 0)
                     {
 
@@ -732,6 +792,7 @@ namespace TerminalCH
                             WriteLog("otgryzka_gp - MyPrint() - обновление itak_sklad_palette - вставка информации про сосканированые руллоны", ex);
                         }
                     }
+
 
                     
 
@@ -1392,14 +1453,11 @@ namespace TerminalCH
                 int iTableWidth1 = 0;
 
 
-                m_iCountRows = dataGridView1.Rows.Count-1;//надо
-                //m_iCountRows = 380;//не надо
-
-
-                int[] iBarCode = new int[m_iCountRows];
-
-                for (int i = 0; i < m_iCountRows; i++)
-                    iBarCode[i] = 71078;
+                if (testPrint)
+                    m_iCountRows = testPrintCountRows;  //не надо
+                else
+                    m_iCountRows = dataGridView1.Rows.Count-1;//надо
+                
                  
                 int iCountRows = 0;
                 if (m_iCountRows > 76)
@@ -1407,12 +1465,23 @@ namespace TerminalCH
                 else
                     iCountRows = m_iCountRows;
 
-                string strTemp;
-                for (int i = 0; i < iCountRows; i++)//надо
+
+                int[] iBarCode = new int[m_iCountRows];
+                if (testPrint)
                 {
-                    strTemp = dataGridView1.Rows[i].Cells[1].Value.ToString().Substring(1);
-                    iBarCode[i] = Convert.ToInt32(strTemp);
+                    for (int i = 0; i < m_iCountRows; i++)
+                        iBarCode[i] = 71078;
                 }
+                else
+                {
+                    string strTemp;
+                    for (int i = 0; i < iCountRows; i++)//надо
+                    {
+                        strTemp = dataGridView1.Rows[i].Cells[1].Value.ToString().Substring(1);
+                        iBarCode[i] = Convert.ToInt32(strTemp);
+                    }
+                }
+
 
                 for (int i = 0; i < m_lstMyRylon.Count - 1; i++)
                 {
@@ -1907,7 +1976,8 @@ namespace TerminalCH
 
                 }
             }
-            else if (m_iFlagPrintPages==6)
+
+            else if(m_iFlagPrintPages == 6)
             {
                 int t = 40;
                 int t1 = t;
@@ -1920,10 +1990,15 @@ namespace TerminalCH
                     int iLeft1 = 50;
                     int[] iCoord1 = new int[6];
                     int iTableWidth1 = 0;
+                    int iCountPageRows = 0;
 
+                    if (m_iCountRows > 382)
+                        iCountPageRows = 382;
+                    else iCountPageRows = m_iCountRows;
 
-                    int iCountRows = m_iCountRows - m_iCounter;
-                    for (i = m_iCounter; i < m_iCountRows; i++)
+                    int iCountRows = iCountPageRows - m_iCounter;
+
+                    for (i = m_iCounter; i < iCountPageRows; i++)
                     {
                         if (i == 280)
                             iLeft1 = iLeft;
@@ -1972,14 +2047,6 @@ namespace TerminalCH
                             else
                                 e.Graphics.DrawLine(new Pen(Color.Black, 1), new Point(iCoord1[j], t1 - 1), new Point(iCoord1[j], t1 + 19));
 
-
-                       /* string strTemp1 = (i + 1).ToString();//не надо
-                        if (Convert.ToInt32(strTemp1) > 9)
-                            e.Graphics.DrawString(strTemp1, fnt10, Brushes.Black, iCoord1[0] + 18, t1);
-                        else
-                            e.Graphics.DrawString(strTemp1, fnt10, Brushes.Black, iCoord1[0] + 25, t1);*/
-
-
                         string strTemp1 = m_lstMyRylon[i].iNumRylona.ToString();//надо
                         if (Convert.ToInt32(strTemp1) > 9)
                             e.Graphics.DrawString(m_lstMyRylon[i].iNumRylona.ToString(), fnt10, Brushes.Black, iCoord1[0] + 18, t1);
@@ -1990,11 +2057,7 @@ namespace TerminalCH
                         e.Graphics.DrawString(m_lstMyRylon[i].dBrytto.ToString("0.00"), fnt10, Brushes.Black, iCoord1[2] + 5, t1);
                         e.Graphics.DrawString(m_lstMyRylon[i].iDlinaRylona.ToString(), fnt10, Brushes.Black, iCoord1[3] + 5, t1);
                         e.Graphics.DrawString(m_lstMyRylon[i].iCountEtiketok.ToString(), fnt10, Brushes.Black, iCoord1[4] + 5, t1);
-                         
 
-
-                        
-                        ////
                         if (((i - m_iCounter) == iCountRows - 1) || ((i - m_iCounter) == (iCountRows - 1) / 2))
                             e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iLeft1, t1 + 18), new Point(iTableWidth1, t1 + 18));
                         else
@@ -2002,13 +2065,9 @@ namespace TerminalCH
 
                         t1 += 20;
                     }
-
-                
                 }
 
-
-
-                if (m_iCountRows <= 354)
+                if (m_iCountRows < 358)
                 {
                     t = t1 + 20;
 
@@ -2057,23 +2116,646 @@ namespace TerminalCH
                     t += 20;
                     e.Graphics.DrawString("приміщенні кислотно лужних та інших агресивних середовищ.", fnt12Bold, Brushes.Black, 40, t);
 
-
-
                     e.Graphics.DrawString("-  4  -", fnt14Bold, Brushes.Black, 375, 1110);
                     m_iCounter = 0;
                     m_iCountRows = 0;
                     e.HasMorePages = false;
                     m_iFlagPrintPages = 1;
                 }
-                else 
+                else
                 {
                     e.Graphics.DrawString("-  4  -", fnt14Bold, Brushes.Black, 375, 1110);
                     e.HasMorePages = true;
+                    m_iCounter = i;
                     m_iFlagPrintPages = 7;
+
+                }
+                
+            }
+
+
+            else if (m_iFlagPrintPages == 7)
+            {
+                int t = 40;
+                int t1 = t;
+                int t2 = t;
+                int i = 0;
+
+                if (m_iCountRows > 382) //+ 102
+                {
+                    int iLeft = 50;
+                    int iLeft1 = 50;
+                    int[] iCoord1 = new int[6];
+                    int iTableWidth1 = 0;
+                    int iCountPageRows = 0;
+
+                    if (m_iCountRows > 484) //+102
+                        iCountPageRows = 484;
+                    else iCountPageRows = m_iCountRows;
+
+                    int iCountRows = iCountPageRows - m_iCounter;
+
+                    for (i = m_iCounter; i < iCountPageRows; i++)
+                    {
+                        if (i == 382)
+                            iLeft1 = iLeft;
+                        else if ((i - m_iCounter) == ((iCountRows + 1) / 2))
+                            iLeft1 = iLeft + 356;
+
+                        iTableWidth1 = iLeft1 + 355;
+
+                        iCoord1[0] = iLeft1;
+                        iCoord1[1] = iLeft1 + 60;
+                        iCoord1[2] = iLeft1 + 130;
+                        iCoord1[3] = iLeft1 + 210;
+                        iCoord1[4] = iLeft1 + 280;
+                        iCoord1[5] = iLeft1 + 355;
+
+                        if (i == 382 || ((i - m_iCounter) == (iCountRows + 1) / 2))
+                        {
+                            t2 = t1;
+                            t1 = t;
+                            e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iLeft1, t1), new Point(iTableWidth1, t1));
+                            e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iLeft1, t1 + 35), new Point(iTableWidth1, t1 + 35));
+                            for (int j = 0; j <= 5; j++)
+                                e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iCoord1[j], t1 - 1), new Point(iCoord1[j], t1 + 36));
+
+                            e.Graphics.DrawString("№", fnt10Bold, Brushes.Black, iLeft1 + 20, t1 + 2);
+                            e.Graphics.DrawString("рулона", fnt10Bold, Brushes.Black, iLeft1 + 5, t1 + 15);
+
+                            e.Graphics.DrawString("Масса", fnt10Bold, Brushes.Black, iLeft1 + 75, t1 + 2);
+                            e.Graphics.DrawString("нетто, кг", fnt10Bold, Brushes.Black, iLeft1 + 65, t1 + 15);
+
+                            e.Graphics.DrawString("Масса", fnt10Bold, Brushes.Black, iLeft1 + 150, t1 + 2);
+                            e.Graphics.DrawString("брутто, кг", fnt10Bold, Brushes.Black, iLeft1 + 135, t1 + 15);
+
+                            e.Graphics.DrawString("Довжина", fnt10Bold, Brushes.Black, iLeft1 + 215, t1 + 2);
+                            e.Graphics.DrawString("м.п.", fnt10Bold, Brushes.Black, iLeft1 + 233, t1 + 15);
+
+                            e.Graphics.DrawString("Кількість", fnt10Bold, Brushes.Black, iLeft1 + 285, t1 + 2);
+                            e.Graphics.DrawString("тис. шт.", fnt10Bold, Brushes.Black, iLeft1 + 290, t1 + 15);
+
+                            t1 += 36;
+                        }
+
+                        for (int j = 0; j <= 5; j++)
+                            if (j == 0 || j == 5)
+                                e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iCoord1[j], t1 - 1), new Point(iCoord1[j], t1 + 19));
+                            else
+                                e.Graphics.DrawLine(new Pen(Color.Black, 1), new Point(iCoord1[j], t1 - 1), new Point(iCoord1[j], t1 + 19));
+
+                        string strTemp1 = m_lstMyRylon[i].iNumRylona.ToString();//надо
+                        if (Convert.ToInt32(strTemp1) > 9)
+                            e.Graphics.DrawString(m_lstMyRylon[i].iNumRylona.ToString(), fnt10, Brushes.Black, iCoord1[0] + 18, t1);
+                        else
+                            e.Graphics.DrawString(m_lstMyRylon[i].iNumRylona.ToString(), fnt10, Brushes.Black, iCoord1[0] + 25, t1);
+
+                        e.Graphics.DrawString(m_lstMyRylon[i].dNetto.ToString("0.00"), fnt10, Brushes.Black, iCoord1[1] + 5, t1);
+                        e.Graphics.DrawString(m_lstMyRylon[i].dBrytto.ToString("0.00"), fnt10, Brushes.Black, iCoord1[2] + 5, t1);
+                        e.Graphics.DrawString(m_lstMyRylon[i].iDlinaRylona.ToString(), fnt10, Brushes.Black, iCoord1[3] + 5, t1);
+                        e.Graphics.DrawString(m_lstMyRylon[i].iCountEtiketok.ToString(), fnt10, Brushes.Black, iCoord1[4] + 5, t1);
+
+                        if (((i - m_iCounter) == iCountRows - 1) || ((i - m_iCounter) == (iCountRows - 1) / 2))
+                            e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iLeft1, t1 + 18), new Point(iTableWidth1, t1 + 18));
+                        else
+                            e.Graphics.DrawLine(new Pen(Color.Black, 1), new Point(iLeft1, t1 + 18), new Point(iTableWidth1, t1 + 18));
+
+                        t1 += 20;
+                    }
+                }
+
+                if (m_iCountRows < 460) 
+                {
+                    t = t1 + 20;
+
+                    e.Graphics.DrawString("Маса нетто:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_dAllNetto.ToString("0.00") + " кг", fnt12BoldUnder, Brushes.Black, 140, t);
+
+                    // if (m_strDateVigotv.Length > 11)
+                    //   m_strDateVigotv = m_strDateVigotv.Remove(11);
+                    e.Graphics.DrawString("Дата виготовлення:", fnt12Bold, Brushes.Black, 450, t);
+                    e.Graphics.DrawString(m_strDateZakaz, fnt12BoldUnder, Brushes.Black, 610, t);
+
+                    t += 25;
+                    e.Graphics.DrawString("Маса брутто:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_dAllBrytto.ToString("0.00") + " кг", fnt12BoldUnder, Brushes.Black, 150, t);
+
+                    t += 25;
+                    e.Graphics.DrawString("Кількість м.п.:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_iAllDlinaRylonov.ToString() + " м.", fnt12BoldUnder, Brushes.Black, 160, t);
+
+                    e.Graphics.DrawString("Зміна:", fnt12Bold, Brushes.Black, 450, t);
+                    e.Graphics.DrawString(m_strSmena, fnt12BoldUnder, Brushes.Black, 505, t);
+
+                    t += 25;
+                    e.Graphics.DrawString("Кількість рулонів:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_iCountRylon.ToString() + " шт.", fnt12BoldUnder, Brushes.Black, 190, t);
+
+
+                    t += 25;
+                    e.Graphics.DrawString("Майстер:", fnt12Bold, Brushes.Black, 550, t);
+                    e.Graphics.DrawString("______________", fnt12Bold, Brushes.Black, 630, t);
+
+                    //t += 25;
+                    e.Graphics.DrawString("Кількість етикетки тис.шт.:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_iAllCountEtiketki + " шт.", fnt12BoldUnder, Brushes.Black, 265, t);
+
+                    t += 40;
+                    e.Graphics.DrawString("Термін зберігання - 12 місяців від дати виготовлення.", fnt14Bold, Brushes.Black, 40, t);
+                    t += 25;
+                    e.Graphics.DrawString("Умови зберігання:", fnt12Bold, Brushes.Black, 40, t);
+                    t += 20;
+                    e.Graphics.DrawString("Плівка повинна зберігатися в закритому приміщенні при температурі +5С до +25С ", fnt12Bold, Brushes.Black, 40, t);
+                    t += 20;
+                    e.Graphics.DrawString("і відносній вологості повітря не більше 80%, на відстані не менш 1 метра від нагріваючих", fnt12Bold, Brushes.Black, 40, t);
+                    t += 20;
+                    e.Graphics.DrawString("пристроїв, в захищеному місці від дії прямих сонячних променів, при відсутності у", fnt12Bold, Brushes.Black, 40, t);
+                    t += 20;
+                    e.Graphics.DrawString("приміщенні кислотно лужних та інших агресивних середовищ.", fnt12Bold, Brushes.Black, 40, t);
+
+                    e.Graphics.DrawString("-  5  -", fnt14Bold, Brushes.Black, 375, 1110);
+                    m_iCounter = 0;
+                    m_iCountRows = 0;
+                    e.HasMorePages = false;
+                    m_iFlagPrintPages = 1;
+                }
+                else
+                {
+                    e.Graphics.DrawString("-  5  -", fnt14Bold, Brushes.Black, 375, 1110);
+                    e.HasMorePages = true;
+                    m_iCounter = i;
+                    m_iFlagPrintPages = 8;
+
                 }
 
             }
-            else if (m_iFlagPrintPages==7)
+
+
+            else if (m_iFlagPrintPages == 8)
+            {
+                int t = 40;
+                int t1 = t;
+                int t2 = t;
+                int i = 0;
+
+                if (m_iCountRows > 484) //+ 102
+                {
+                    int iLeft = 50;
+                    int iLeft1 = 50;
+                    int[] iCoord1 = new int[6];
+                    int iTableWidth1 = 0;
+                    int iCountPageRows = 0;
+
+                    if (m_iCountRows > 586) //+102
+                        iCountPageRows = 586;
+                    else iCountPageRows = m_iCountRows;
+
+                    int iCountRows = iCountPageRows - m_iCounter;
+
+                    for (i = m_iCounter; i < iCountPageRows; i++)
+                    {
+                        if (i == 484)
+                            iLeft1 = iLeft;
+                        else if ((i - m_iCounter) == ((iCountRows + 1) / 2))
+                            iLeft1 = iLeft + 356;
+
+                        iTableWidth1 = iLeft1 + 355;
+
+                        iCoord1[0] = iLeft1;
+                        iCoord1[1] = iLeft1 + 60;
+                        iCoord1[2] = iLeft1 + 130;
+                        iCoord1[3] = iLeft1 + 210;
+                        iCoord1[4] = iLeft1 + 280;
+                        iCoord1[5] = iLeft1 + 355;
+
+                        if (i == 484 || ((i - m_iCounter) == (iCountRows + 1) / 2))
+                        {
+                            t2 = t1;
+                            t1 = t;
+                            e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iLeft1, t1), new Point(iTableWidth1, t1));
+                            e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iLeft1, t1 + 35), new Point(iTableWidth1, t1 + 35));
+                            for (int j = 0; j <= 5; j++)
+                                e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iCoord1[j], t1 - 1), new Point(iCoord1[j], t1 + 36));
+
+                            e.Graphics.DrawString("№", fnt10Bold, Brushes.Black, iLeft1 + 20, t1 + 2);
+                            e.Graphics.DrawString("рулона", fnt10Bold, Brushes.Black, iLeft1 + 5, t1 + 15);
+
+                            e.Graphics.DrawString("Масса", fnt10Bold, Brushes.Black, iLeft1 + 75, t1 + 2);
+                            e.Graphics.DrawString("нетто, кг", fnt10Bold, Brushes.Black, iLeft1 + 65, t1 + 15);
+
+                            e.Graphics.DrawString("Масса", fnt10Bold, Brushes.Black, iLeft1 + 150, t1 + 2);
+                            e.Graphics.DrawString("брутто, кг", fnt10Bold, Brushes.Black, iLeft1 + 135, t1 + 15);
+
+                            e.Graphics.DrawString("Довжина", fnt10Bold, Brushes.Black, iLeft1 + 215, t1 + 2);
+                            e.Graphics.DrawString("м.п.", fnt10Bold, Brushes.Black, iLeft1 + 233, t1 + 15);
+
+                            e.Graphics.DrawString("Кількість", fnt10Bold, Brushes.Black, iLeft1 + 285, t1 + 2);
+                            e.Graphics.DrawString("тис. шт.", fnt10Bold, Brushes.Black, iLeft1 + 290, t1 + 15);
+
+                            t1 += 36;
+                        }
+
+                        for (int j = 0; j <= 5; j++)
+                            if (j == 0 || j == 5)
+                                e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iCoord1[j], t1 - 1), new Point(iCoord1[j], t1 + 19));
+                            else
+                                e.Graphics.DrawLine(new Pen(Color.Black, 1), new Point(iCoord1[j], t1 - 1), new Point(iCoord1[j], t1 + 19));
+
+                        string strTemp1 = m_lstMyRylon[i].iNumRylona.ToString();//надо
+                        if (Convert.ToInt32(strTemp1) > 9)
+                            e.Graphics.DrawString(m_lstMyRylon[i].iNumRylona.ToString(), fnt10, Brushes.Black, iCoord1[0] + 18, t1);
+                        else
+                            e.Graphics.DrawString(m_lstMyRylon[i].iNumRylona.ToString(), fnt10, Brushes.Black, iCoord1[0] + 25, t1);
+
+                        e.Graphics.DrawString(m_lstMyRylon[i].dNetto.ToString("0.00"), fnt10, Brushes.Black, iCoord1[1] + 5, t1);
+                        e.Graphics.DrawString(m_lstMyRylon[i].dBrytto.ToString("0.00"), fnt10, Brushes.Black, iCoord1[2] + 5, t1);
+                        e.Graphics.DrawString(m_lstMyRylon[i].iDlinaRylona.ToString(), fnt10, Brushes.Black, iCoord1[3] + 5, t1);
+                        e.Graphics.DrawString(m_lstMyRylon[i].iCountEtiketok.ToString(), fnt10, Brushes.Black, iCoord1[4] + 5, t1);
+
+                        if (((i - m_iCounter) == iCountRows - 1) || ((i - m_iCounter) == (iCountRows - 1) / 2))
+                            e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iLeft1, t1 + 18), new Point(iTableWidth1, t1 + 18));
+                        else
+                            e.Graphics.DrawLine(new Pen(Color.Black, 1), new Point(iLeft1, t1 + 18), new Point(iTableWidth1, t1 + 18));
+
+                        t1 += 20;
+                    }
+                }
+
+                if (m_iCountRows < 562) // top + 78
+                {
+                    t = t1 + 20;
+
+                    e.Graphics.DrawString("Маса нетто:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_dAllNetto.ToString("0.00") + " кг", fnt12BoldUnder, Brushes.Black, 140, t);
+
+                    // if (m_strDateVigotv.Length > 11)
+                    //   m_strDateVigotv = m_strDateVigotv.Remove(11);
+                    e.Graphics.DrawString("Дата виготовлення:", fnt12Bold, Brushes.Black, 450, t);
+                    e.Graphics.DrawString(m_strDateZakaz, fnt12BoldUnder, Brushes.Black, 610, t);
+
+                    t += 25;
+                    e.Graphics.DrawString("Маса брутто:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_dAllBrytto.ToString("0.00") + " кг", fnt12BoldUnder, Brushes.Black, 150, t);
+
+                    t += 25;
+                    e.Graphics.DrawString("Кількість м.п.:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_iAllDlinaRylonov.ToString() + " м.", fnt12BoldUnder, Brushes.Black, 160, t);
+
+                    e.Graphics.DrawString("Зміна:", fnt12Bold, Brushes.Black, 450, t);
+                    e.Graphics.DrawString(m_strSmena, fnt12BoldUnder, Brushes.Black, 505, t);
+
+                    t += 25;
+                    e.Graphics.DrawString("Кількість рулонів:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_iCountRylon.ToString() + " шт.", fnt12BoldUnder, Brushes.Black, 190, t);
+
+
+                    t += 25;
+                    e.Graphics.DrawString("Майстер:", fnt12Bold, Brushes.Black, 550, t);
+                    e.Graphics.DrawString("______________", fnt12Bold, Brushes.Black, 630, t);
+
+                    //t += 25;
+                    e.Graphics.DrawString("Кількість етикетки тис.шт.:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_iAllCountEtiketki + " шт.", fnt12BoldUnder, Brushes.Black, 265, t);
+
+                    t += 40;
+                    e.Graphics.DrawString("Термін зберігання - 12 місяців від дати виготовлення.", fnt14Bold, Brushes.Black, 40, t);
+                    t += 25;
+                    e.Graphics.DrawString("Умови зберігання:", fnt12Bold, Brushes.Black, 40, t);
+                    t += 20;
+                    e.Graphics.DrawString("Плівка повинна зберігатися в закритому приміщенні при температурі +5С до +25С ", fnt12Bold, Brushes.Black, 40, t);
+                    t += 20;
+                    e.Graphics.DrawString("і відносній вологості повітря не більше 80%, на відстані не менш 1 метра від нагріваючих", fnt12Bold, Brushes.Black, 40, t);
+                    t += 20;
+                    e.Graphics.DrawString("пристроїв, в захищеному місці від дії прямих сонячних променів, при відсутності у", fnt12Bold, Brushes.Black, 40, t);
+                    t += 20;
+                    e.Graphics.DrawString("приміщенні кислотно лужних та інших агресивних середовищ.", fnt12Bold, Brushes.Black, 40, t);
+
+                    e.Graphics.DrawString("-  6  -", fnt14Bold, Brushes.Black, 375, 1110);
+                    m_iCounter = 0;
+                    m_iCountRows = 0;
+                    e.HasMorePages = false;
+                    m_iFlagPrintPages = 1;
+                }
+                else
+                {
+                    e.Graphics.DrawString("-  6  -", fnt14Bold, Brushes.Black, 375, 1110);
+                    e.HasMorePages = true;
+                    m_iCounter = i;
+                    m_iFlagPrintPages = 9;
+                }
+            }
+
+            else if (m_iFlagPrintPages == 9)
+            {
+                int t = 40;
+                int t1 = t;
+                int t2 = t;
+                int i = 0;
+
+                if (m_iCountRows > 586) //+ 102
+                {
+                    int iLeft = 50;
+                    int iLeft1 = 50;
+                    int[] iCoord1 = new int[6];
+                    int iTableWidth1 = 0;
+                    int iCountPageRows = 0;
+
+                    if (m_iCountRows > 688) //+102
+                        iCountPageRows = 688;
+                    else iCountPageRows = m_iCountRows;
+
+                    int iCountRows = iCountPageRows - m_iCounter;
+
+                    for (i = m_iCounter; i < iCountPageRows; i++)
+                    {
+                        if (i == 586)   //top
+                            iLeft1 = iLeft;
+                        else if ((i - m_iCounter) == ((iCountRows + 1) / 2))
+                            iLeft1 = iLeft + 356;
+
+                        iTableWidth1 = iLeft1 + 355;
+
+                        iCoord1[0] = iLeft1;
+                        iCoord1[1] = iLeft1 + 60;
+                        iCoord1[2] = iLeft1 + 130;
+                        iCoord1[3] = iLeft1 + 210;
+                        iCoord1[4] = iLeft1 + 280;
+                        iCoord1[5] = iLeft1 + 355;
+
+                        if (i == 586 || ((i - m_iCounter) == (iCountRows + 1) / 2)) //top
+                        {
+                            t2 = t1;
+                            t1 = t;
+                            e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iLeft1, t1), new Point(iTableWidth1, t1));
+                            e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iLeft1, t1 + 35), new Point(iTableWidth1, t1 + 35));
+                            for (int j = 0; j <= 5; j++)
+                                e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iCoord1[j], t1 - 1), new Point(iCoord1[j], t1 + 36));
+
+                            e.Graphics.DrawString("№", fnt10Bold, Brushes.Black, iLeft1 + 20, t1 + 2);
+                            e.Graphics.DrawString("рулона", fnt10Bold, Brushes.Black, iLeft1 + 5, t1 + 15);
+
+                            e.Graphics.DrawString("Масса", fnt10Bold, Brushes.Black, iLeft1 + 75, t1 + 2);
+                            e.Graphics.DrawString("нетто, кг", fnt10Bold, Brushes.Black, iLeft1 + 65, t1 + 15);
+
+                            e.Graphics.DrawString("Масса", fnt10Bold, Brushes.Black, iLeft1 + 150, t1 + 2);
+                            e.Graphics.DrawString("брутто, кг", fnt10Bold, Brushes.Black, iLeft1 + 135, t1 + 15);
+
+                            e.Graphics.DrawString("Довжина", fnt10Bold, Brushes.Black, iLeft1 + 215, t1 + 2);
+                            e.Graphics.DrawString("м.п.", fnt10Bold, Brushes.Black, iLeft1 + 233, t1 + 15);
+
+                            e.Graphics.DrawString("Кількість", fnt10Bold, Brushes.Black, iLeft1 + 285, t1 + 2);
+                            e.Graphics.DrawString("тис. шт.", fnt10Bold, Brushes.Black, iLeft1 + 290, t1 + 15);
+
+                            t1 += 36;
+                        }
+
+                        for (int j = 0; j <= 5; j++)
+                            if (j == 0 || j == 5)
+                                e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iCoord1[j], t1 - 1), new Point(iCoord1[j], t1 + 19));
+                            else
+                                e.Graphics.DrawLine(new Pen(Color.Black, 1), new Point(iCoord1[j], t1 - 1), new Point(iCoord1[j], t1 + 19));
+
+                        string strTemp1 = m_lstMyRylon[i].iNumRylona.ToString();//надо
+                        if (Convert.ToInt32(strTemp1) > 9)
+                            e.Graphics.DrawString(m_lstMyRylon[i].iNumRylona.ToString(), fnt10, Brushes.Black, iCoord1[0] + 18, t1);
+                        else
+                            e.Graphics.DrawString(m_lstMyRylon[i].iNumRylona.ToString(), fnt10, Brushes.Black, iCoord1[0] + 25, t1);
+
+                        e.Graphics.DrawString(m_lstMyRylon[i].dNetto.ToString("0.00"), fnt10, Brushes.Black, iCoord1[1] + 5, t1);
+                        e.Graphics.DrawString(m_lstMyRylon[i].dBrytto.ToString("0.00"), fnt10, Brushes.Black, iCoord1[2] + 5, t1);
+                        e.Graphics.DrawString(m_lstMyRylon[i].iDlinaRylona.ToString(), fnt10, Brushes.Black, iCoord1[3] + 5, t1);
+                        e.Graphics.DrawString(m_lstMyRylon[i].iCountEtiketok.ToString(), fnt10, Brushes.Black, iCoord1[4] + 5, t1);
+
+                        if (((i - m_iCounter) == iCountRows - 1) || ((i - m_iCounter) == (iCountRows - 1) / 2))
+                            e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iLeft1, t1 + 18), new Point(iTableWidth1, t1 + 18));
+                        else
+                            e.Graphics.DrawLine(new Pen(Color.Black, 1), new Point(iLeft1, t1 + 18), new Point(iTableWidth1, t1 + 18));
+
+                        t1 += 20;
+                    }
+                }
+
+                if (m_iCountRows < 664) // top + 78
+                {
+                    t = t1 + 20;
+
+                    e.Graphics.DrawString("Маса нетто:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_dAllNetto.ToString("0.00") + " кг", fnt12BoldUnder, Brushes.Black, 140, t);
+
+                    // if (m_strDateVigotv.Length > 11)
+                    //   m_strDateVigotv = m_strDateVigotv.Remove(11);
+                    e.Graphics.DrawString("Дата виготовлення:", fnt12Bold, Brushes.Black, 450, t);
+                    e.Graphics.DrawString(m_strDateZakaz, fnt12BoldUnder, Brushes.Black, 610, t);
+
+                    t += 25;
+                    e.Graphics.DrawString("Маса брутто:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_dAllBrytto.ToString("0.00") + " кг", fnt12BoldUnder, Brushes.Black, 150, t);
+
+                    t += 25;
+                    e.Graphics.DrawString("Кількість м.п.:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_iAllDlinaRylonov.ToString() + " м.", fnt12BoldUnder, Brushes.Black, 160, t);
+
+                    e.Graphics.DrawString("Зміна:", fnt12Bold, Brushes.Black, 450, t);
+                    e.Graphics.DrawString(m_strSmena, fnt12BoldUnder, Brushes.Black, 505, t);
+
+                    t += 25;
+                    e.Graphics.DrawString("Кількість рулонів:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_iCountRylon.ToString() + " шт.", fnt12BoldUnder, Brushes.Black, 190, t);
+
+
+                    t += 25;
+                    e.Graphics.DrawString("Майстер:", fnt12Bold, Brushes.Black, 550, t);
+                    e.Graphics.DrawString("______________", fnt12Bold, Brushes.Black, 630, t);
+
+                    //t += 25;
+                    e.Graphics.DrawString("Кількість етикетки тис.шт.:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_iAllCountEtiketki + " шт.", fnt12BoldUnder, Brushes.Black, 265, t);
+
+                    t += 40;
+                    e.Graphics.DrawString("Термін зберігання - 12 місяців від дати виготовлення.", fnt14Bold, Brushes.Black, 40, t);
+                    t += 25;
+                    e.Graphics.DrawString("Умови зберігання:", fnt12Bold, Brushes.Black, 40, t);
+                    t += 20;
+                    e.Graphics.DrawString("Плівка повинна зберігатися в закритому приміщенні при температурі +5С до +25С ", fnt12Bold, Brushes.Black, 40, t);
+                    t += 20;
+                    e.Graphics.DrawString("і відносній вологості повітря не більше 80%, на відстані не менш 1 метра від нагріваючих", fnt12Bold, Brushes.Black, 40, t);
+                    t += 20;
+                    e.Graphics.DrawString("пристроїв, в захищеному місці від дії прямих сонячних променів, при відсутності у", fnt12Bold, Brushes.Black, 40, t);
+                    t += 20;
+                    e.Graphics.DrawString("приміщенні кислотно лужних та інших агресивних середовищ.", fnt12Bold, Brushes.Black, 40, t);
+
+                    e.Graphics.DrawString("-  7  -", fnt14Bold, Brushes.Black, 375, 1110);
+                    m_iCounter = 0;
+                    m_iCountRows = 0;
+                    e.HasMorePages = false;
+                    m_iFlagPrintPages = 1;
+                }
+                else
+                {
+                    e.Graphics.DrawString("-  7  -", fnt14Bold, Brushes.Black, 375, 1110);
+                    e.HasMorePages = true;
+                    m_iCounter = i;
+                    m_iFlagPrintPages = 10;
+                }
+            }
+
+            else if (m_iFlagPrintPages == 10)
+            {
+                int t = 40;
+                int t1 = t;
+                int t2 = t;
+                int i = 0;
+
+                if (m_iCountRows > 688) //+ 102
+                {
+                    int iLeft = 50;
+                    int iLeft1 = 50;
+                    int[] iCoord1 = new int[6];
+                    int iTableWidth1 = 0;
+                    int iCountPageRows = 0;
+
+                    if (m_iCountRows > 790) //+102
+                        iCountPageRows = 790;
+                    else iCountPageRows = m_iCountRows;
+
+                    int iCountRows = iCountPageRows - m_iCounter;
+
+                    for (i = m_iCounter; i < iCountPageRows; i++)
+                    {
+                        if (i == 688)   //top
+                            iLeft1 = iLeft;
+                        else if ((i - m_iCounter) == ((iCountRows + 1) / 2))
+                            iLeft1 = iLeft + 356;
+
+                        iTableWidth1 = iLeft1 + 355;
+
+                        iCoord1[0] = iLeft1;
+                        iCoord1[1] = iLeft1 + 60;
+                        iCoord1[2] = iLeft1 + 130;
+                        iCoord1[3] = iLeft1 + 210;
+                        iCoord1[4] = iLeft1 + 280;
+                        iCoord1[5] = iLeft1 + 355;
+
+                        if (i == 688 || ((i - m_iCounter) == (iCountRows + 1) / 2)) //top
+                        {
+                            t2 = t1;
+                            t1 = t;
+                            e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iLeft1, t1), new Point(iTableWidth1, t1));
+                            e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iLeft1, t1 + 35), new Point(iTableWidth1, t1 + 35));
+                            for (int j = 0; j <= 5; j++)
+                                e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iCoord1[j], t1 - 1), new Point(iCoord1[j], t1 + 36));
+
+                            e.Graphics.DrawString("№", fnt10Bold, Brushes.Black, iLeft1 + 20, t1 + 2);
+                            e.Graphics.DrawString("рулона", fnt10Bold, Brushes.Black, iLeft1 + 5, t1 + 15);
+
+                            e.Graphics.DrawString("Масса", fnt10Bold, Brushes.Black, iLeft1 + 75, t1 + 2);
+                            e.Graphics.DrawString("нетто, кг", fnt10Bold, Brushes.Black, iLeft1 + 65, t1 + 15);
+
+                            e.Graphics.DrawString("Масса", fnt10Bold, Brushes.Black, iLeft1 + 150, t1 + 2);
+                            e.Graphics.DrawString("брутто, кг", fnt10Bold, Brushes.Black, iLeft1 + 135, t1 + 15);
+
+                            e.Graphics.DrawString("Довжина", fnt10Bold, Brushes.Black, iLeft1 + 215, t1 + 2);
+                            e.Graphics.DrawString("м.п.", fnt10Bold, Brushes.Black, iLeft1 + 233, t1 + 15);
+
+                            e.Graphics.DrawString("Кількість", fnt10Bold, Brushes.Black, iLeft1 + 285, t1 + 2);
+                            e.Graphics.DrawString("тис. шт.", fnt10Bold, Brushes.Black, iLeft1 + 290, t1 + 15);
+
+                            t1 += 36;
+                        }
+
+                        for (int j = 0; j <= 5; j++)
+                            if (j == 0 || j == 5)
+                                e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iCoord1[j], t1 - 1), new Point(iCoord1[j], t1 + 19));
+                            else
+                                e.Graphics.DrawLine(new Pen(Color.Black, 1), new Point(iCoord1[j], t1 - 1), new Point(iCoord1[j], t1 + 19));
+
+                        string strTemp1 = m_lstMyRylon[i].iNumRylona.ToString();//надо
+                        if (Convert.ToInt32(strTemp1) > 9)
+                            e.Graphics.DrawString(m_lstMyRylon[i].iNumRylona.ToString(), fnt10, Brushes.Black, iCoord1[0] + 18, t1);
+                        else
+                            e.Graphics.DrawString(m_lstMyRylon[i].iNumRylona.ToString(), fnt10, Brushes.Black, iCoord1[0] + 25, t1);
+
+                        e.Graphics.DrawString(m_lstMyRylon[i].dNetto.ToString("0.00"), fnt10, Brushes.Black, iCoord1[1] + 5, t1);
+                        e.Graphics.DrawString(m_lstMyRylon[i].dBrytto.ToString("0.00"), fnt10, Brushes.Black, iCoord1[2] + 5, t1);
+                        e.Graphics.DrawString(m_lstMyRylon[i].iDlinaRylona.ToString(), fnt10, Brushes.Black, iCoord1[3] + 5, t1);
+                        e.Graphics.DrawString(m_lstMyRylon[i].iCountEtiketok.ToString(), fnt10, Brushes.Black, iCoord1[4] + 5, t1);
+
+                        if (((i - m_iCounter) == iCountRows - 1) || ((i - m_iCounter) == (iCountRows - 1) / 2))
+                            e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iLeft1, t1 + 18), new Point(iTableWidth1, t1 + 18));
+                        else
+                            e.Graphics.DrawLine(new Pen(Color.Black, 1), new Point(iLeft1, t1 + 18), new Point(iTableWidth1, t1 + 18));
+
+                        t1 += 20;
+                    }
+                }
+
+                if (m_iCountRows < 766) // top + 78
+                {
+                    t = t1 + 20;
+
+                    e.Graphics.DrawString("Маса нетто:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_dAllNetto.ToString("0.00") + " кг", fnt12BoldUnder, Brushes.Black, 140, t);
+
+                    // if (m_strDateVigotv.Length > 11)
+                    //   m_strDateVigotv = m_strDateVigotv.Remove(11);
+                    e.Graphics.DrawString("Дата виготовлення:", fnt12Bold, Brushes.Black, 450, t);
+                    e.Graphics.DrawString(m_strDateZakaz, fnt12BoldUnder, Brushes.Black, 610, t);
+
+                    t += 25;
+                    e.Graphics.DrawString("Маса брутто:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_dAllBrytto.ToString("0.00") + " кг", fnt12BoldUnder, Brushes.Black, 150, t);
+
+                    t += 25;
+                    e.Graphics.DrawString("Кількість м.п.:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_iAllDlinaRylonov.ToString() + " м.", fnt12BoldUnder, Brushes.Black, 160, t);
+
+                    e.Graphics.DrawString("Зміна:", fnt12Bold, Brushes.Black, 450, t);
+                    e.Graphics.DrawString(m_strSmena, fnt12BoldUnder, Brushes.Black, 505, t);
+
+                    t += 25;
+                    e.Graphics.DrawString("Кількість рулонів:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_iCountRylon.ToString() + " шт.", fnt12BoldUnder, Brushes.Black, 190, t);
+
+
+                    t += 25;
+                    e.Graphics.DrawString("Майстер:", fnt12Bold, Brushes.Black, 550, t);
+                    e.Graphics.DrawString("______________", fnt12Bold, Brushes.Black, 630, t);
+
+                    //t += 25;
+                    e.Graphics.DrawString("Кількість етикетки тис.шт.:", fnt12Bold, Brushes.Black, 40, t);
+                    e.Graphics.DrawString(m_iAllCountEtiketki + " шт.", fnt12BoldUnder, Brushes.Black, 265, t);
+
+                    t += 40;
+                    e.Graphics.DrawString("Термін зберігання - 12 місяців від дати виготовлення.", fnt14Bold, Brushes.Black, 40, t);
+                    t += 25;
+                    e.Graphics.DrawString("Умови зберігання:", fnt12Bold, Brushes.Black, 40, t);
+                    t += 20;
+                    e.Graphics.DrawString("Плівка повинна зберігатися в закритому приміщенні при температурі +5С до +25С ", fnt12Bold, Brushes.Black, 40, t);
+                    t += 20;
+                    e.Graphics.DrawString("і відносній вологості повітря не більше 80%, на відстані не менш 1 метра від нагріваючих", fnt12Bold, Brushes.Black, 40, t);
+                    t += 20;
+                    e.Graphics.DrawString("пристроїв, в захищеному місці від дії прямих сонячних променів, при відсутності у", fnt12Bold, Brushes.Black, 40, t);
+                    t += 20;
+                    e.Graphics.DrawString("приміщенні кислотно лужних та інших агресивних середовищ.", fnt12Bold, Brushes.Black, 40, t);
+
+                    e.Graphics.DrawString("-  8  -", fnt14Bold, Brushes.Black, 375, 1110);
+                    m_iCounter = 0;
+                    m_iCountRows = 0;
+                    e.HasMorePages = false;
+                    m_iFlagPrintPages = 1;
+                }
+                else
+                {
+                    e.Graphics.DrawString("-  8  -", fnt14Bold, Brushes.Black, 375, 1110);
+                    e.HasMorePages = true;
+                    m_iCounter = i;
+                    m_iFlagPrintPages = 11;
+                }
+            }
+
+
+         
+            else if (m_iFlagPrintPages == 11 )
             {
                 int t = 40;
                 int t1 = t;
@@ -2128,7 +2810,7 @@ namespace TerminalCH
 
 
 
-                e.Graphics.DrawString("-  5  -", fnt14Bold, Brushes.Black, 375, 1110);
+                e.Graphics.DrawString("-  9  -", fnt14Bold, Brushes.Black, 375, 1110);
                 m_iCounter = 0;
                 m_iCountRows = 0;
                 e.HasMorePages = false;
