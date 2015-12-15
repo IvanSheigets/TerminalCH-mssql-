@@ -132,7 +132,7 @@ namespace TerminalCH
             myConnection = new SqlConnection(Connect);
             try
             {
-                myConnection.Open();
+               // myConnection.Open();
             }
             catch (System.Exception ex)
             {
