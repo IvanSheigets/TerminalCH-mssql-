@@ -238,6 +238,7 @@ namespace TerminalCH
             m_iDlinaRylona = 0;
             m_iCountEtiketki = 0;
             m_iNumRylona = 0;
+            m_dSquare = 0;
            // m_lstMyRylon.Clear();
            // m_lstBarCode.Clear();
         }
@@ -293,14 +294,12 @@ namespace TerminalCH
                                         reader.Close();
                                     }
                                 }
-
                             }
                             else
                             {
                                 MyDialog.Show("Палета не найдена");
                                 reader.Close();
                             }
-
                         }
                         catch (System.Exception ex)
                         {
@@ -403,8 +402,6 @@ namespace TerminalCH
                                 ClearVariable();
                             }
 
-
-
                             if (m_bAddRylon == true)
                             {
 
@@ -450,8 +447,6 @@ namespace TerminalCH
                                     }
                                   
                                 }
-
-
 
                                 ////////получение последующих значении заказчика и проверка на добаление этого рулона
                                 /*if (m_strZakazchik.Length != 0 && m_iZakazId != 0 && m_bAddRylon == true)
@@ -838,7 +833,6 @@ namespace TerminalCH
 
                             //dlgPrint.ShowDialog();
                             docPrint.Print();
-
                         }
                         else
                             MessageBox.Show("Принтер не доступен!");
@@ -891,7 +885,7 @@ namespace TerminalCH
                     e.Graphics.DrawLine(new Pen(Color.Black, 1), new Point(iCoord1[j], t1 - 1), new Point(iCoord1[j], t1 + 19));
         }
 
-        private void DrawRylonData(PrintPageEventArgs e, int iCountRows, int iCurrentRylon, int [] iCoord1, int iLeft1, int t1, int iTableWidth1)
+        private void DrawRylonData(PrintPageEventArgs e, int iCountRows, int iCurrentRylon, int [] iCoord1, int iLeft1, ref int t1, int iTableWidth1)
         {
             string strTemp1 = m_lstMyRylon[iCurrentRylon].iNumRylona.ToString();//надо
             if (Convert.ToInt32(strTemp1) > 9)
@@ -911,6 +905,8 @@ namespace TerminalCH
                 e.Graphics.DrawLine(new Pen(Color.Black, 2), new Point(iLeft1, t1 + 18), new Point(iTableWidth1, t1 + 18));
             else
                 e.Graphics.DrawLine(new Pen(Color.Black, 1), new Point(iLeft1, t1 + 18), new Point(iTableWidth1, t1 + 18));
+
+            t1 += 20;
         }
 
         private void DrawSummaryInformation(PrintPageEventArgs e, ref int t)
@@ -963,6 +959,20 @@ namespace TerminalCH
             e.Graphics.DrawString("приміщенні кислотно лужних та інших агресивних середовищ.", fnt12Bold, Brushes.Black, 40, t);
         }
         
+        private int[] CalulateICoord(int iLeft)
+        {
+            int[] iCoord = new int[m_iColumnCount];
+            iCoord[0] = iLeft;
+            iCoord[1] = iLeft + 49;
+            iCoord[2] = iLeft + 109;
+            iCoord[3] = iLeft + 176;
+            iCoord[4] = iLeft + 238;
+            iCoord[5] = iLeft + 304;
+            iCoord[6] = iLeft + 355;
+
+            return iCoord;
+        }
+
         //////////////////////////////////////////////////////////////////////////
         private void docPrint_PrintPage(object sender, PrintPageEventArgs e)
         {
@@ -1496,11 +1506,6 @@ namespace TerminalCH
 
                     for (int j = 0; j < ssL; j++)
                     {
-                        /*if (strCodeSymbol[j] == 'b')
-                            e.Graphics.DrawLine(new Pen(Color.Black, 1), new Point(x, t), new Point(x, iHeight));
-                        else if (strCodeSymbol[j] == 'w')
-                            e.Graphics.DrawLine(new Pen(Color.White, 1), new Point(x, t), new Point(x, iHeight));*/
-
                         if (strCodeSymbol[j] == 'w')
                             e.Graphics.DrawLine(new Pen(Color.Black, 1), new Point(x, t), new Point(x, iHeight));
                         else if (strCodeSymbol[j] == 'n')
@@ -1562,22 +1567,18 @@ namespace TerminalCH
                 
                 int t1 = t;
                 int iLeft1 = 0;
-                int t2 = t;
                 int iTableWidth1 = 0;
-
 
                 if (testPrint)
                     m_iCountRows = testPrintCountRows;  //не надо
                 else
                     m_iCountRows = dataGridView1.Rows.Count-1;//надо
-                
                  
                 int iCountRows = 0;
                 if (m_iCountRows > 76)
                     iCountRows = 76;
                 else
                     iCountRows = m_iCountRows;
-
 
                 int[] iBarCode = new int[m_iCountRows];
                 if (testPrint)
@@ -1609,10 +1610,8 @@ namespace TerminalCH
                 }
 
                 m_iColumnCount = 7;
-                int[] iCoord1 = new int[m_iColumnCount];// = { iLeft, iLeft + 60, iLeft + 130, iLeft + 210, iLeft + 280, iLeft + 355 };
-                //int iCountPrintRows = 0;
-
                 iLeft1 = iLeft;
+
                 for (m_iCounter = 0; m_iCounter < iCountRows; m_iCounter++)
                 {
                     if (m_iCounter == 0)
@@ -1621,18 +1620,10 @@ namespace TerminalCH
                         iLeft1 = iLeft + 356;
 
                     iTableWidth1 = iLeft1 + 355;
-
-                    iCoord1[0] = iLeft1;
-                    iCoord1[1] = iLeft1 + 49;
-                    iCoord1[2] = iLeft1 + 109;
-                    iCoord1[3] = iLeft1 + 176;
-                    iCoord1[4] = iLeft1 + 238;
-                    iCoord1[5] = iLeft1 + 304;
-                    iCoord1[6] = iLeft1 + 355;
+                    int[] iCoord1 = CalulateICoord(iLeft1);
 
                    if (m_iCounter == 0 || m_iCounter == ((iCountRows + 1) / 2))
                    {
-                        t2 = t1;
                         t1 = t;
                         DrawColumnHeaders(e, iCoord1, m_iColumnCount, iLeft1, ref t1, iTableWidth1);
                     }
@@ -1645,9 +1636,7 @@ namespace TerminalCH
                     else
                         e.Graphics.DrawString(strTemp1, fnt10, Brushes.Black, iCoord1[0] + 25, t1);*/
 
-                   DrawRylonData(e, iCountRows, m_iCounter, iCoord1, iLeft1, t1, iTableWidth1);
-
-                    t1 += 20;
+                   DrawRylonData(e, iCountRows, m_iCounter, iCoord1, iLeft1, ref t1, iTableWidth1);
                 }
 
                
@@ -1655,7 +1644,7 @@ namespace TerminalCH
                 if (iCountRows <= 50)
                 {
                     t = t1;
-                    t += 20;
+                    t1 += 20;
                     DrawSummaryInformation(e, ref t);
 
                     m_iCounter = 0;
@@ -1672,17 +1661,15 @@ namespace TerminalCH
                 }
             }
             else if (m_iFlagPrintPages == 4)
-           {
+            {
                 int t = 40;
                 int t1 = t;
-                int t2 = t;
                 int i = 0;
 
-                if (m_iCountRows>76)
+                if (m_iCountRows > 76)
                 {
                     int iLeft = 50;
                     int iLeft1 = 50;
-                    int[] iCoord1 = new int[6];
                     int iTableWidth1 = 0;
                     int iCountPageRows = 0;
 
@@ -1701,10 +1688,10 @@ namespace TerminalCH
                             iLeft1 = iLeft + 356;
 
                         iTableWidth1 = iLeft1 + 355;
+                        int[] iCoord1 = CalulateICoord(iLeft1);
 
                         if (i == 76 || ((i-m_iCounter) == (iCountRows+1) / 2))
                         {
-                            t2 = t1;
                             t1 = t;
                             DrawColumnHeaders(e, iCoord1, m_iColumnCount, iLeft1, ref t1, iTableWidth1);
                         }
@@ -1715,15 +1702,9 @@ namespace TerminalCH
                             e.Graphics.DrawString(strTemp1, fnt10, Brushes.Black, iCoord1[0] + 18, t1);
                         else
                             e.Graphics.DrawString(strTemp1, fnt10, Brushes.Black, iCoord1[0] + 25, t1);*/
-
-
-                        DrawRylonData(e, iCountRows, m_iCounter, iCoord1, iLeft1, t1, iTableWidth1);
-                        t1 += 20;
-                }
-
-                
+                        DrawRylonData(e, iCountRows, i, iCoord1, iLeft1, ref t1, iTableWidth1);
                     }
-
+                }
 
                 if (m_iCountRows <= 150)
                 {
@@ -1749,14 +1730,12 @@ namespace TerminalCH
             {
                 int t = 40;
                 int t1 = t;
-                int t2 = t;
                 int i =0;
 
                 if (m_iCountRows > 178)
                 {
                     int iLeft = 50;
                     int iLeft1 = 50;
-                    int[] iCoord1 = new int[6];
                     int iTableWidth1 = 0;
                     int iCountPageRows = 0;
 
@@ -1774,11 +1753,10 @@ namespace TerminalCH
                             iLeft1 = iLeft + 356;
 
                         iTableWidth1 = iLeft1 + 355;
-
+                        int[] iCoord1 = CalulateICoord(iLeft1);
 
                         if (i == 178 || ((i - m_iCounter) == (iCountRows + 1) / 2))
                         {
-                            t2 = t1;
                             t1 = t;
                             DrawColumnHeaders(e, iCoord1, m_iColumnCount, iLeft1, ref t1, iTableWidth1);
                         }
@@ -1792,10 +1770,7 @@ namespace TerminalCH
                         else
                             e.Graphics.DrawString(strTemp1, fnt10, Brushes.Black, iCoord1[0] + 25, t1);*/
 
-
-                        DrawRylonData(e, iCountRows, m_iCounter, iCoord1, iLeft1, t1, iTableWidth1);
-
-                        t1 += 20;
+                        DrawRylonData(e, iCountRows, i, iCoord1, iLeft1, ref t1, iTableWidth1);
                     }
 
 
@@ -1827,14 +1802,12 @@ namespace TerminalCH
             {
                 int t = 40;
                 int t1 = t;
-                int t2 = t;
                 int i = 0;
 
                 if (m_iCountRows > 280)
                 {
                     int iLeft = 50;
                     int iLeft1 = 50;
-                    int[] iCoord1 = new int[6];
                     int iTableWidth1 = 0;
                     int iCountPageRows = 0;
 
@@ -1852,18 +1825,15 @@ namespace TerminalCH
                             iLeft1 = iLeft + 356;
 
                         iTableWidth1 = iLeft1 + 355;
+                        int[] iCoord1 = CalulateICoord(iLeft1);
 
                         if (i == 280 || ((i - m_iCounter) == (iCountRows + 1) / 2))
                         {
-                            t2 = t1;
                             t1 = t;
                             DrawColumnHeaders(e, iCoord1, m_iColumnCount, iLeft1, ref t1, iTableWidth1);
                         }
                         DrawColumnHeaderSeparator(e, iCoord1, m_iColumnCount, t1);
-
-                        DrawRylonData(e, iCountRows, m_iCounter, iCoord1, iLeft1, t1, iTableWidth1);
-
-                        t1 += 20;
+                        DrawRylonData(e, iCountRows, i, iCoord1, iLeft1, ref t1, iTableWidth1);
                     }
                 }
 
@@ -1885,24 +1855,18 @@ namespace TerminalCH
                     e.HasMorePages = true;
                     m_iCounter = i;
                     m_iFlagPrintPages = 7;
-
                 }
-                
             }
-
-
             else if (m_iFlagPrintPages == 7)
             {
                 int t = 40;
                 int t1 = t;
-                int t2 = t;
                 int i = 0;
 
                 if (m_iCountRows > 382) //+ 102
                 {
                     int iLeft = 50;
                     int iLeft1 = 50;
-                    int[] iCoord1 = new int[6];
                     int iTableWidth1 = 0;
                     int iCountPageRows = 0;
 
@@ -1920,18 +1884,16 @@ namespace TerminalCH
                             iLeft1 = iLeft + 356;
 
                         iTableWidth1 = iLeft1 + 355;
+                        int[] iCoord1 = CalulateICoord(iLeft1);
 
                         if (i == 382 || ((i - m_iCounter) == (iCountRows + 1) / 2))
                         {
-                            t2 = t1;
                             t1 = t;
                             DrawColumnHeaders(e, iCoord1, m_iColumnCount, iLeft1, ref t1, iTableWidth1);
                         }
                         DrawColumnHeaderSeparator(e, iCoord1, m_iColumnCount, t1);
 
-                        DrawRylonData(e, iCountRows, m_iCounter, iCoord1, iLeft1, t1, iTableWidth1);
-
-                        t1 += 20;
+                        DrawRylonData(e, iCountRows, i, iCoord1, iLeft1, ref t1, iTableWidth1);
                     }
                 }
 
@@ -1963,14 +1925,12 @@ namespace TerminalCH
             {
                 int t = 40;
                 int t1 = t;
-                int t2 = t;
                 int i = 0;
 
                 if (m_iCountRows > 484) //+ 102
                 {
                     int iLeft = 50;
                     int iLeft1 = 50;
-                    int[] iCoord1 = new int[6];
                     int iTableWidth1 = 0;
                     int iCountPageRows = 0;
 
@@ -1988,18 +1948,15 @@ namespace TerminalCH
                             iLeft1 = iLeft + 356;
 
                         iTableWidth1 = iLeft1 + 355;
+                        int[] iCoord1 = CalulateICoord(iLeft1);
 
                         if (i == 484 || ((i - m_iCounter) == (iCountRows + 1) / 2))
                         {
-                            t2 = t1;
                             t1 = t;
                             DrawColumnHeaders(e, iCoord1, m_iColumnCount, iLeft1, ref t1, iTableWidth1);
                         }
                         DrawColumnHeaderSeparator(e, iCoord1, m_iColumnCount, t1);
-
-                        DrawRylonData(e, iCountRows, m_iCounter, iCoord1, iLeft1, t1, iTableWidth1);
-
-                        t1 += 20;
+                        DrawRylonData(e, iCountRows, i, iCoord1, iLeft1, ref t1, iTableWidth1);
                     }
                 }
 
@@ -2028,14 +1985,12 @@ namespace TerminalCH
             {
                 int t = 40;
                 int t1 = t;
-                int t2 = t;
                 int i = 0;
 
                 if (m_iCountRows > 586) //+ 102
                 {
                     int iLeft = 50;
                     int iLeft1 = 50;
-                    int[] iCoord1 = new int[6];
                     int iTableWidth1 = 0;
                     int iCountPageRows = 0;
 
@@ -2053,18 +2008,15 @@ namespace TerminalCH
                             iLeft1 = iLeft + 356;
 
                         iTableWidth1 = iLeft1 + 355;
+                        int[] iCoord1 = CalulateICoord(iLeft1);
 
                         if (i == 586 || ((i - m_iCounter) == (iCountRows + 1) / 2)) //top
                         {
-                            t2 = t1;
                             t1 = t;
                             DrawColumnHeaders(e, iCoord1, m_iColumnCount, iLeft1, ref t1, iTableWidth1);
                         }
                         DrawColumnHeaderSeparator(e, iCoord1, m_iColumnCount, t1);
-
-                        DrawRylonData(e, iCountRows, m_iCounter, iCoord1, iLeft1, t1, iTableWidth1);
-
-                        t1 += 20;
+                        DrawRylonData(e, iCountRows, i, iCoord1, iLeft1, ref t1, iTableWidth1);
                     }
                 }
 
@@ -2093,14 +2045,12 @@ namespace TerminalCH
             {
                 int t = 40;
                 int t1 = t;
-                int t2 = t;
                 int i = 0;
 
                 if (m_iCountRows > 688) //+ 102
                 {
                     int iLeft = 50;
                     int iLeft1 = 50;
-                    int[] iCoord1 = new int[6];
                     int iTableWidth1 = 0;
                     int iCountPageRows = 0;
 
@@ -2118,18 +2068,16 @@ namespace TerminalCH
                             iLeft1 = iLeft + 356;
 
                         iTableWidth1 = iLeft1 + 355;
+                        int[] iCoord1 = CalulateICoord(iLeft1);
 
                         if (i == 688 || ((i - m_iCounter) == (iCountRows + 1) / 2)) //top
                         {
-                            t2 = t1;
                             t1 = t;
                             DrawColumnHeaders(e, iCoord1, m_iColumnCount, iLeft1, ref t1, iTableWidth1);
                         }
                         DrawColumnHeaderSeparator(e, iCoord1, m_iColumnCount, t1);
 
-                        DrawRylonData(e, iCountRows, m_iCounter, iCoord1, iLeft1, t1, iTableWidth1);
-
-                        t1 += 20;
+                        DrawRylonData(e, iCountRows, i, iCoord1, iLeft1, ref t1, iTableWidth1);
                     }
                 }
 
@@ -2160,7 +2108,6 @@ namespace TerminalCH
             {
                 int t = 40;
                 int t1 = t;
-                int t2 = t;
                 
                 t = t1 + 20;
 
@@ -2195,6 +2142,7 @@ namespace TerminalCH
                 m_iCountEtiketki = 0;
                 m_iNumRylona = 0;
                 m_iRylonWidth = 0;
+                m_dSquare = 0;
 
                 m_iDlinaEtiketki = 0;
 
