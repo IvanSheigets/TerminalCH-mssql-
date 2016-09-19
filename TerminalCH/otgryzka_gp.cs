@@ -599,7 +599,7 @@ namespace TerminalCH
         private void TestPrint()
         {
             testPrint = true;
-            m_testPrintCountRows = 1096;
+            m_testPrintCountRows = 20;
 
             m_lstMyRylon = SetListTempValue(m_testPrintCountRows);
 
@@ -905,6 +905,9 @@ namespace TerminalCH
 
         private void DrawSummaryInformation(PrintPageEventArgs e, ref int t)
         {
+            if (m_iCountRows % 2 != 0)  // if m_iCount is not parity add spaces between first column and second
+                t += 30; 
+
             e.Graphics.DrawString("Маса нетто:", fnt12Bold, Brushes.Black, 40, t);
             e.Graphics.DrawString(m_dAllNetto.ToString("0.00") + " кг", fnt12BoldUnder, Brushes.Black, 140, t);
 
