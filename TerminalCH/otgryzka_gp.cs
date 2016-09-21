@@ -59,7 +59,7 @@ namespace TerminalCH
         int m_iZakazchikId = 0;
         int m_iZakazchikIdNew = 0;
 
-        int m_iPaletteID = 0;
+        UInt64 m_iPaletteID = 0;
 
         double m_dAllNetto = 0;
         double m_dAllBrytto = 0;
@@ -652,9 +652,9 @@ namespace TerminalCH
                         try
                         {
                             reader.Read();
-                            if (reader[0] != DBNull.Value && Convert.ToInt16(reader[0])!=0)
+                            if (reader[0] != DBNull.Value && Convert.ToUInt64(reader[0])!=0)
                             {
-                                m_iPaletteID = Convert.ToInt32(reader[0]);
+                                m_iPaletteID = Convert.ToUInt64(reader[0]);
                                 reader.Close();
 
                                 strQuery = "select count_rylon from itak_etiketka.dbo.itak_sklad_palette where id=" + m_iPaletteID;
@@ -688,7 +688,7 @@ namespace TerminalCH
                                                 reader.Read();
                                                 if (reader.HasRows)
                                                 {
-                                                    m_iPaletteID = Convert.ToInt32(reader[0]);
+                                                    m_iPaletteID = Convert.ToUInt64(reader[0]);
                                                    
                                                 }
                                                 reader.Close();
@@ -730,7 +730,7 @@ namespace TerminalCH
                                     reader.Read();
                                     if (reader.HasRows)
                                     {
-                                        m_iPaletteID = Convert.ToInt32(reader[0]);
+                                        m_iPaletteID = Convert.ToUInt64(reader[0]);
                                         
                                     }
                                     reader.Close();
